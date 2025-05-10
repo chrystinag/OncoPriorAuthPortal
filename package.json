@@ -1,8 +1,9 @@
 {
-  "name": "stealth-prior-auth",
+  "name": "onco-prior-auth-portal",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@supabase/supabase-js": "^2.0.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.3.0",

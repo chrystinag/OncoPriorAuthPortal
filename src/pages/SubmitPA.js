@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -39,7 +38,7 @@ export default function SubmitPA() {
       let fileURL = null;
       if (file) {
         const filePath = `${patientRes.data.id}/${file.name}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from("documents")
           .upload(filePath, file);
 
