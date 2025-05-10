@@ -1,4 +1,8 @@
 import React from 'react';
 export default function Patients() {
-  return <div>Patients Page</div>;
+  return (
+    <div>
+      <h1>Patients: View profiles, notes, documents.</h1>
+    </div>
+  );
 }
