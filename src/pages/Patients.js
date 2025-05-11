@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   "https://wzenvycwzxitcmusaxak.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6ZW52eWN3enhpdGNtdXNheGFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyNDMzNjgsImV4cCI6MjA2MTgxOTM2OH0.sbrjDCHlvPPKQkkHdF63lvDkWuCXKPD2gI3zPOdzYRo"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 );
 
 export default function Patients() {
@@ -51,7 +51,9 @@ export default function Patients() {
           <tbody>
             {patients.map((patient) => (
               <tr key={patient.id}>
-                <td>{patient.name}</td>
+                <td>
+                  <Link to={`/patients/${patient.id}`}>{patient.name}</Link>
+                </td>
                 <td>{patient.dob}</td>
                 <td>{patient.diagnosis}</td>
                 <td>{patient.insurance}</td>
