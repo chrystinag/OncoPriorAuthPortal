@@ -1,3 +1,4 @@
+import ProtectedRoute from "../ProtectedRoute";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -21,11 +22,11 @@ export default function App() {
 
         {/* Protected Layout Routes */}
         <Route element={<MainLayout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/submit" element={<SubmitPA />} />
-          <Route path="/patients" element={<Patients />} />
-          <Route path="/tasks" element={<Tasks />} />
-        </Route>
+  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+  <Route path="/submit" element={<ProtectedRoute><SubmitPA /></ProtectedRoute>} />
+  <Route path="/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
+  <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+</Route>
       </Routes>
     </Router>
   );
