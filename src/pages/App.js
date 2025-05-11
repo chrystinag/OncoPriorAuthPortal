@@ -1,7 +1,7 @@
-
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
+import Home from "./Home";
 import Dashboard from "./Dashboard";
 import SubmitPA from "./SubmitPA";
 import Patients from "./Patients";
@@ -14,13 +14,13 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        {/* Public Auth Routes */}
+        {/* Public Routes */}
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
         {/* Protected Layout Routes */}
         <Route element={<MainLayout />}>
-          <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/submit" element={<SubmitPA />} />
           <Route path="/patients" element={<Patients />} />
