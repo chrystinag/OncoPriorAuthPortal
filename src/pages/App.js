@@ -1,4 +1,4 @@
-import ProtectedRoute from "../ProtectedRoute";
+
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
@@ -10,6 +10,7 @@ import Tasks from "./Tasks";
 import Login from "./Login";
 import Signup from "./Signup";
 import MainLayout from "./MainLayout";
+import ProtectedRoute from "../ProtectedRoute";
 
 export default function App() {
   return (
@@ -20,13 +21,13 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Protected Layout Routes */}
+        {/* Authenticated Protected Routes */}
         <Route element={<MainLayout />}>
-  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-  <Route path="/submit" element={<ProtectedRoute><SubmitPA /></ProtectedRoute>} />
-  <Route path="/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
-  <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
-</Route>
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/submit" element={<ProtectedRoute><SubmitPA /></ProtectedRoute>} />
+          <Route path="/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
+          <Route path="/tasks" element={<ProtectedRoute><Tasks /></ProtectedRoute>} />
+        </Route>
       </Routes>
     </Router>
   );
