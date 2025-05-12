@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
@@ -87,7 +86,29 @@ export default function PatientDetails() {
       <ul>
         {paRequests.map((pa) => (
           <li key={pa.id}>
-            <p><strong>Status:</strong> {pa.status || "Submitted"}</p>
+            <div>
+              <strong>Status:</strong> {pa.status || "Submitted"}
+              <select
+                value={pa.status || "Submitted"}
+                onChange={async (e) => {
+                  await supabase
+                    .from("pa_requests")
+                    .update({ status: e.target.value })
+                    .eq("id", pa.id);
+                  const { data: updated } = await supabase
+                    .from("pa_requests")
+                    .select("*")
+                    .eq("patient_id", id);
+                  setPARequests(updated);
+                }}
+              >
+                <option value="Submitted">Submitted</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="P2P Requested">P2P Requested</option>
+                <option value="Denied">Denied</option>
+              </select>
+            </div>
             <p>{pa.notes}</p>
             {pa.document_url && (
               <a href={pa.document_url} target="_blank" rel="noreferrer">View Document</a>
