@@ -9,6 +9,7 @@ import Tasks from "./Tasks";
 import Login from "./Login";
 import Signup from "./Signup";
 import MainLayout from "./MainLayout";
+import PatientDetails from "./PatientDetails";
 import ProtectedRoute from "../ProtectedRoute";
 
 export default function App() {
@@ -20,7 +21,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
 
-        {/* Authenticated Protected Routes */}
+        {/* Protected Auth Routes */}
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/submit" element={<ProtectedRoute><SubmitPA /></ProtectedRoute>} />
