@@ -14,16 +14,34 @@ export default function PatientDetails() {
   const [notes, setNotes] = useState([]);
   const [paRequests, setPARequests] = useState([]);
   const [newNote, setNewNote] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDetails = async () => {
-      const { data: patientData } = await supabase.from("patients").select("*").eq("id", id).single();
-      const { data: noteData } = await supabase.from("notes").select("*").eq("patient_id", id).order("created_at", { ascending: false });
-      const { data: paData } = await supabase.from("pa_requests").select("*").eq("patient_id", id).order("created_at", { ascending: false });
+      try {
+        const { data: patientData } = await supabase
+          .from("patients")
+          .select("*")
+          .eq("id", id)
+          .single();
 
-      setPatient(patientData);
-      setNotes(noteData || []);
-      setPARequests(paData || []);
+        const { data: noteData } = await supabase
+          .from("notes")
+          .select("*")
+          .eq("patient_id", id);
+
+        const { data: paData } = await supabase
+          .from("pa_requests")
+          .select("*")
+          .eq("patient_id", id);
+
+        setPatient(patientData);
+        setNotes(noteData || []);
+        setPARequests(paData || []);
+      } catch (err) {
+        console.error("Error fetching patient details:", err);
+      }
+      setLoading(false);
     };
 
     fetchDetails();
@@ -32,12 +50,16 @@ export default function PatientDetails() {
   const addNote = async () => {
     if (!newNote.trim()) return;
     await supabase.from("notes").insert([{ patient_id: id, content: newNote }]);
-    setNewNote("");
-    const { data: updatedNotes } = await supabase.from("notes").select("*").eq("patient_id", id).order("created_at", { ascending: false });
+    const { data: updatedNotes } = await supabase
+      .from("notes")
+      .select("*")
+      .eq("patient_id", id);
     setNotes(updatedNotes);
+    setNewNote("");
   };
 
-  if (!patient) return <p>Loading patient details...</p>;
+  if (loading) return <p>Loading...</p>;
+  if (!patient) return <p>Patient not found.</p>;
 
   return (
     <div>
@@ -46,24 +68,26 @@ export default function PatientDetails() {
       <p>Diagnosis: {patient.diagnosis}</p>
       <p>Insurance: {patient.insurance}</p>
 
-      <h3>Clinical Notes</h3>
-      <div>
-        <textarea value={newNote} onChange={(e) => setNewNote(e.target.value)} placeholder="Add a note" />
-        <button onClick={addNote}>Save Note</button>
-      </div>
+      <h3>Notes</h3>
+      <textarea
+        value={newNote}
+        onChange={(e) => setNewNote(e.target.value)}
+        placeholder="Add a note"
+      />
+      <button onClick={addNote}>Save Note</button>
       <ul>
-        {notes.map(note => (
+        {notes.map((note) => (
           <li key={note.id}>
-            <strong>{new Date(note.created_at).toLocaleString()}:</strong> {note.content}
+            <strong>Note:</strong> {note.content}
           </li>
         ))}
       </ul>
 
-      <h3>PA Submission History</h3>
+      <h3>Prior Auth Submissions</h3>
       <ul>
-        {paRequests.map(pa => (
+        {paRequests.map((pa) => (
           <li key={pa.id}>
-            <p><strong>{new Date(pa.created_at).toLocaleString()}</strong> - {pa.status}</p>
+            <p><strong>Status:</strong> {pa.status || "Submitted"}</p>
             <p>{pa.notes}</p>
             {pa.document_url && (
               <a href={pa.document_url} target="_blank" rel="noreferrer">View Document</a>
