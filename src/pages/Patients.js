@@ -1,10 +1,11 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   "https://wzenvycwzxitcmusaxak.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind6ZW52eWN3enhpdGNtdXNheGFrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyNDMzNjgsImV4cCI6MjA2MTgxOTM2OH0.sbrjDCHlvPPKQkkHdF63lvDkWuCXKPD2gI3zPOdzYRo"
 );
 
 export default function Patients() {
@@ -13,13 +14,10 @@ export default function Patients() {
 
   useEffect(() => {
     const fetchPatients = async () => {
-      const { data, error } = await supabase
-        .from("patients")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const { data, error } = await supabase.from("patients").select("*");
 
       if (error) {
-        console.error("Error loading patients:", error);
+        console.error("Error loading patients:", error.message);
       } else {
         setPatients(data);
       }
@@ -45,7 +43,6 @@ export default function Patients() {
               <th>DOB</th>
               <th>Diagnosis</th>
               <th>Insurance</th>
-              <th>Created</th>
             </tr>
           </thead>
           <tbody>
@@ -57,7 +54,6 @@ export default function Patients() {
                 <td>{patient.dob}</td>
                 <td>{patient.diagnosis}</td>
                 <td>{patient.insurance}</td>
-                <td>{new Date(patient.created_at).toLocaleDateString()}</td>
               </tr>
             ))}
           </tbody>
