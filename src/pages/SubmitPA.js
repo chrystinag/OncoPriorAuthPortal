@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 
@@ -11,8 +10,15 @@ export default function SubmitPA() {
   const [formData, setFormData] = useState({
     name: "",
     dob: "",
-    diagnosis: "",
+    sex: "",
     insurance: "",
+    primary_dx: "",
+    secondary_dx: "",
+    jcodes: "",
+    height: "",
+    weight: "",
+    frequency: "",
+    dosing: "",
     notes: ""
   });
   const [file, setFile] = useState(null);
@@ -29,62 +35,45 @@ export default function SubmitPA() {
     setMessage("");
 
     try {
-      if (!formData.name || !formData.dob || !formData.insurance) {
+      const { name, dob, insurance } = formData;
+      if (!name || !dob || !insurance) {
         setMessage("Name, DOB, and Insurance are required.");
         setUploading(false);
         return;
       }
 
-      const patientData = {
-        name: formData.name,
-        dob: formData.dob,
-        diagnosis: formData.diagnosis || "",
-        insurance: formData.insurance
-      };
-
-      const { data: newPatient, error: patientError } = await supabase
+      const { data: patient, error: patientError } = await supabase
         .from("patients")
-        .insert([patientData])
+        .insert([formData])
         .select()
         .single();
 
-      if (patientError) {
-        throw new Error("Error creating patient: " + patientError.message);
-      }
+      if (patientError) throw new Error("Error creating patient: " + patientError.message);
 
       let fileURL = null;
       if (file) {
-        const filePath = `${newPatient.id}/${file.name}`;
-        const { error: uploadError } = await supabase.storage
-          .from("documents")
-          .upload(filePath, file);
-
-        if (uploadError) {
-          console.error("File upload error:", uploadError.message);
-        } else {
-          const { data: publicURL } = supabase.storage
-            .from("documents")
-            .getPublicUrl(filePath);
-          fileURL = publicURL?.publicUrl || null;
+        const path = `${patient.id}/${file.name}`;
+        const { error: uploadError } = await supabase.storage.from("documents").upload(path, file);
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
+          fileURL = urlData?.publicUrl;
         }
       }
 
-      const paData = {
-        patient_id: newPatient.id,
-        notes: formData.notes || "",
+      const { error: paError } = await supabase.from("pa_requests").insert([{
+        patient_id: patient.id,
+        notes: formData.notes,
         document_url: fileURL
-      };
+      }]);
 
-      const { error: paError } = await supabase
-        .from("pa_requests")
-        .insert([paData]);
+      if (paError) throw new Error("Error saving PA: " + paError.message);
 
-      if (paError) {
-        throw new Error("Error creating PA request: " + paError.message);
-      }
-
-      setMessage("✅ Prior Auth submitted successfully.");
-      setFormData({ name: "", dob: "", diagnosis: "", insurance: "", notes: "" });
+      setMessage("✅ Prior Auth submitted.");
+      setFormData({
+        name: "", dob: "", sex: "", insurance: "",
+        primary_dx: "", secondary_dx: "", jcodes: "",
+        height: "", weight: "", frequency: "", dosing: "", notes: ""
+      });
       setFile(null);
     } catch (err) {
       console.error(err);
@@ -98,11 +87,22 @@ export default function SubmitPA() {
     <div>
       <h1>Submit Prior Authorization</h1>
       <form onSubmit={handleSubmit}>
+        <h3>Member Demographics</h3>
         <input name="name" placeholder="Patient Name *" value={formData.name} onChange={handleChange} required />
         <input name="dob" type="date" value={formData.dob} onChange={handleChange} required />
-        <input name="diagnosis" placeholder="Diagnosis" value={formData.diagnosis} onChange={handleChange} />
+        <input name="sex" placeholder="Sex (M/F)" value={formData.sex} onChange={handleChange} />
         <input name="insurance" placeholder="Insurance *" value={formData.insurance} onChange={handleChange} required />
-        <textarea name="notes" placeholder="Clinical Notes" value={formData.notes} onChange={handleChange} />
+
+        <h3>Clinical Information</h3>
+        <input name="primary_dx" placeholder="Primary Diagnosis Code" value={formData.primary_dx} onChange={handleChange} />
+        <input name="secondary_dx" placeholder="Secondary Diagnosis Code(s)" value={formData.secondary_dx} onChange={handleChange} />
+        <input name="jcodes" placeholder="J-Codes / Drug Codes" value={formData.jcodes} onChange={handleChange} />
+        <input name="height" placeholder="Height (inches)" value={formData.height} onChange={handleChange} />
+        <input name="weight" placeholder="Weight (lbs)" value={formData.weight} onChange={handleChange} />
+        <input name="frequency" placeholder="Treatment Frequency (e.g., weekly)" value={formData.frequency} onChange={handleChange} />
+        <input name="dosing" placeholder="Dosing Instructions" value={formData.dosing} onChange={handleChange} />
+
+        <textarea name="notes" placeholder="Additional Clinical Notes" value={formData.notes} onChange={handleChange} />
         <input type="file" onChange={(e) => setFile(e.target.files[0])} />
         <button type="submit" disabled={uploading}>
           {uploading ? "Submitting..." : "Submit Prior Auth"}
