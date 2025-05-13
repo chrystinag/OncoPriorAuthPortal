@@ -11,14 +11,14 @@ const supabase = createClient(
 export default function Dashboard() {
   const [paRequests, setPARequests] = useState([]);
   const [statusCounts, setStatusCounts] = useState({});
+  const [statusFilter, setStatusFilter] = useState(null);
 
   useEffect(() => {
     const fetchPAs = async () => {
       const { data, error } = await supabase
         .from("pa_requests")
         .select("*, patients(*)")
-        .order("created_at", { ascending: false })
-        .limit(10);
+        .order("created_at", { ascending: false });
 
       if (error) {
         console.error("Error loading PA requests:", error.message);
@@ -38,6 +38,9 @@ export default function Dashboard() {
   }, []);
 
   const statusList = ["Submitted", "Pending", "P2P Requested", "Approved", "Denied"];
+  const filteredRequests = statusFilter
+    ? paRequests.filter((pa) => (pa.status || "Submitted") === statusFilter)
+    : paRequests;
 
   return (
     <div>
@@ -45,15 +48,26 @@ export default function Dashboard() {
 
       <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
         {statusList.map((status) => (
-          <div key={status} style={{ padding: "1rem", background: "#f4f4f4", borderRadius: "8px", flex: 1 }}>
+          <div
+            key={status}
+            style={{
+              padding: "1rem",
+              background: "#f4f4f4",
+              borderRadius: "8px",
+              flex: 1,
+              cursor: "pointer",
+              border: statusFilter === status ? "2px solid #333" : "none"
+            }}
+            onClick={() => setStatusFilter(statusFilter === status ? null : status)}
+          >
             <h4>{status}</h4>
             <p style={{ fontSize: "1.5rem", fontWeight: "bold" }}>{statusCounts[status] || 0}</p>
           </div>
         ))}
       </div>
 
-      <h2>Recent PA Requests</h2>
-      {paRequests.length === 0 ? (
+      <h2>{statusFilter ? `Filtered: ${statusFilter}` : "Recent PA Requests"}</h2>
+      {filteredRequests.length === 0 ? (
         <p>No prior auths found.</p>
       ) : (
         <table style={{ width: "100%", borderCollapse: "collapse" }}>
@@ -61,13 +75,14 @@ export default function Dashboard() {
             <tr>
               <th>Patient</th>
               <th>Status</th>
+              <th>Assigned To</th>
               <th>Notes</th>
               <th>Document</th>
               <th>Date</th>
             </tr>
           </thead>
           <tbody>
-            {paRequests.map((pa) => (
+            {filteredRequests.map((pa) => (
               <tr key={pa.id}>
                 <td>
                   <Link to={`/patients/${pa.patient_id}`}>
@@ -75,6 +90,7 @@ export default function Dashboard() {
                   </Link>
                 </td>
                 <td>{pa.status || "Submitted"}</td>
+                <td>{pa.assigned_to || "-"}</td>
                 <td>{pa.notes?.slice(0, 40)}...</td>
                 <td>
                   {pa.document_url ? (
