@@ -9,9 +9,9 @@ const supabase = createClient(
 export default function SubmitPA() {
   const [formData, setFormData] = useState({
     contact_name: "", contact_phone: "", contact_fax: "",
-    first_name: "", last_name: "", dob: "", member_id: "",
-    insurance: "", sex: "", height: "", weight: "", bsa: "",
-    primary_dx: "", secondary_dx: [""],
+    first_name: "", last_name: "", dob: "", sex: "",
+    height: "", weight: "", bsa: "", member_id: "", insurance: "",
+    primary_dx: "", cancer_stage: "", secondary_dx: [""],
     chemoTreatments: [{ jcode: "", drug_name: "", route: "", dose: "", dosing_schedule: "", indication: "", delivery: "" }],
     supportiveTreatments: [{ jcode: "", drug_name: "", route: "", dose: "", dosing_schedule: "", indication: "", delivery: "" }],
     ordering_provider: "", ordering_npi: "", ordering_tin: "",
@@ -28,7 +28,7 @@ export default function SubmitPA() {
     const weight = parseFloat(formData.weight);
     if (height && weight) {
       const bsa = Math.sqrt((height * weight) / 3600).toFixed(2);
-      setFormData((prev) => ({ ...prev, bsa }));
+      setFormData(prev => ({ ...prev, bsa }));
     }
   }, [formData.height, formData.weight]);
 
@@ -52,21 +52,15 @@ export default function SubmitPA() {
     e.preventDefault();
     setUploading(true);
     setMessage("");
-
     try {
       const patientData = {
         ...formData,
-        secondary_dx: formData.secondary_dx.filter((dx) => dx.trim() !== ""),
+        secondary_dx: formData.secondary_dx.filter(dx => dx.trim() !== ""),
         chemoTreatments: JSON.stringify(formData.chemoTreatments),
         supportiveTreatments: JSON.stringify(formData.supportiveTreatments),
       };
-
       const { data: patient, error } = await supabase
-        .from("patients")
-        .insert([patientData])
-        .select()
-        .single();
-
+        .from("patients").insert([patientData]).select().single();
       if (error) throw new Error("Submission failed: " + error.message);
 
       let fileURL = null;
@@ -78,19 +72,12 @@ export default function SubmitPA() {
           fileURL = urlData?.publicUrl;
         }
       }
-
-      await supabase.from("pa_requests").insert([{
-        patient_id: patient.id,
-        document_url: fileURL,
-        notes: formData.notes,
-      }]);
-
+      await supabase.from("pa_requests").insert([{ patient_id: patient.id, document_url: fileURL, notes: formData.notes }]);
       setMessage("✅ Prior Authorization submitted.");
     } catch (err) {
       console.error(err);
       setMessage(err.message || "Submission error.");
     }
-
     setUploading(false);
   };
 
@@ -99,40 +86,68 @@ export default function SubmitPA() {
       <h1>Submit Prior Authorization</h1>
       <form onSubmit={handleSubmit}>
         <h3>📞 Contact Info</h3>
-        {["contact_name", "contact_phone", "contact_fax"].map(field => (
-          <div key={field} style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-            <label>{field.replaceAll("_", " ").toUpperCase()}</label>
-            <input name={field} value={formData[field]} onChange={handleChange} />
-          </div>
-        ))}
+        <div style={{ display: "flex", gap: "10px" }}>
+          {["contact_name", "contact_phone", "contact_fax"].map(field => (
+            <div key={field} style={{ display: "flex", flexDirection: "column" }}>
+              <label>{field.replaceAll("_", " ").toUpperCase()}</label>
+              <input name={field} value={formData[field]} onChange={handleChange} />
+            </div>
+          ))}
+        </div>
 
         <h3>👤 Patient Information</h3>
-        {["first_name", "last_name", "dob", "member_id", "insurance", "sex", "height", "weight", "bsa"].map(field => (
-          <div key={field} style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-            <label>{field.replaceAll("_", " ").toUpperCase()}</label>
-            <input
-              name={field}
-              value={formData[field]}
-              onChange={handleChange}
-              {...(field === "dob" ? { type: "date" } : {})}
-              {...(field === "bsa" ? { readOnly: true } : {})}
-            />
-          </div>
-        ))}
+        <div style={{ display: "flex", gap: "10px" }}>
+          {["first_name", "last_name", "dob", "sex"].map(field => (
+            <div key={field} style={{ display: "flex", flexDirection: "column" }}>
+              <label>{field.replaceAll("_", " ").toUpperCase()}</label>
+              <input name={field} value={formData[field]} onChange={handleChange} {...(field === "dob" ? { type: "date" } : {})} />
+            </div>
+          ))}
+        </div>
+        <div style={{ display: "flex", gap: "10px" }}>
+          {["height", "weight", "bsa"].map(field => (
+            <div key={field} style={{ display: "flex", flexDirection: "column" }}>
+              <label>{field.replaceAll("_", " ").toUpperCase()}</label>
+              <input name={field} value={formData[field]} onChange={handleChange} {...(field === "bsa" ? { readOnly: true } : {})} />
+            </div>
+          ))}
+        </div>
 
         <h4>Diagnosis</h4>
-        <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-          <label>Primary ICD Code *</label>
-          <input name="primary_dx" value={formData.primary_dx} onChange={handleChange} required />
+        <div style={{ display: "flex", gap: "10px" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label>PRIMARY ICD *</label>
+            <input name="primary_dx" value={formData.primary_dx} onChange={handleChange} required />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <label>CANCER STAGE</label>
+            <select name="cancer_stage" value={formData.cancer_stage} onChange={handleChange}>
+              <option value="">Select</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="Metastatic">Metastatic</option>
+            </select>
+          </div>
         </div>
         {formData.secondary_dx.map((dx, idx) => (
-          <div key={idx} style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-            <label>Secondary ICD Code</label>
+          <div key={idx} style={{ display: "flex", flexDirection: "column" }}>
+            <label>SECONDARY ICD</label>
             <input value={dx} onChange={(e) => handleSecondaryDxChange(idx, e.target.value)} />
           </div>
         ))}
         <button type="button" onClick={addSecondaryDx}>+ Add Secondary Diagnosis</button>
 
+        <h3>💳 Insurance Info</h3>
+        <div style={{ display: "flex", gap: "10px" }}>
+          {["member_id", "insurance"].map(field => (
+            <div key={field} style={{ display: "flex", flexDirection: "column" }}>
+              <label>{field.replaceAll("_", " ").toUpperCase()}</label>
+              <input name={field} value={formData[field]} onChange={handleChange} />
+            </div>
+          ))}
+        </div>
         <h3>💊 Chemotherapy</h3>
         {formData.chemoTreatments.map((t, i) => (
           <div key={i} style={{ border: "1px solid #ccc", margin: "10px", padding: "10px" }}>
@@ -143,7 +158,7 @@ export default function SubmitPA() {
               </div>
             ))}
             <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>Route</label>
+              <label>ROUTE</label>
               <select value={t.route} onChange={(e) => handleTreatmentChange("chemoTreatments", i, "route", e.target.value)}>
                 <option value="">Select</option>
                 <option value="IV">IV</option>
@@ -151,7 +166,7 @@ export default function SubmitPA() {
               </select>
             </div>
             <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>Delivery Method</label>
+              <label>DELIVERY</label>
               <select value={t.delivery} onChange={(e) => handleTreatmentChange("chemoTreatments", i, "delivery", e.target.value)}>
                 <option value="">Select</option>
                 <option value="Buy & Bill">Buy & Bill</option>
@@ -161,6 +176,7 @@ export default function SubmitPA() {
           </div>
         ))}
         <button type="button" onClick={() => addTreatment("chemoTreatments")}>+ Add Chemo</button>
+
         <h3>💉 Supportive Medications</h3>
         {formData.supportiveTreatments.map((t, i) => (
           <div key={i} style={{ border: "1px solid #ccc", margin: "10px", padding: "10px" }}>
@@ -171,7 +187,7 @@ export default function SubmitPA() {
               </div>
             ))}
             <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>Route</label>
+              <label>ROUTE</label>
               <select value={t.route} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, "route", e.target.value)}>
                 <option value="">Select</option>
                 <option value="IV">IV</option>
@@ -179,7 +195,7 @@ export default function SubmitPA() {
               </select>
             </div>
             <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>Delivery Method</label>
+              <label>DELIVERY</label>
               <select value={t.delivery} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, "delivery", e.target.value)}>
                 <option value="">Select</option>
                 <option value="Buy & Bill">Buy & Bill</option>
@@ -200,11 +216,11 @@ export default function SubmitPA() {
 
         <h3>📎 Attachments + Notes</h3>
         <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-          <label>Clinical Notes</label>
+          <label>CLINICAL NOTES</label>
           <textarea name="notes" value={formData.notes} onChange={handleChange} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-          <label>File Upload</label>
+          <label>FILE UPLOAD</label>
           <input type="file" onChange={(e) => setFile(e.target.files[0])} />
         </div>
 
