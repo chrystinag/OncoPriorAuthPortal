@@ -148,71 +148,98 @@ export default function SubmitPA() {
             </div>
           ))}
         </div>
-        <h3>💊 Chemotherapy</h3>
-        {formData.chemoTreatments.map((t, i) => (
-          <div key={i} style={{ border: "1px solid #ccc", margin: "10px", padding: "10px" }}>
-            {["jcode", "drug_name", "dose", "dosing_schedule", "indication"].map(field => (
-              <div key={field} style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-                <label>{field.replaceAll("_", " ").toUpperCase()}</label>
-                <input value={t[field]} onChange={(e) => handleTreatmentChange("chemoTreatments", i, field, e.target.value)} />
-              </div>
-            ))}
-            <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>ROUTE</label>
-              <select value={t.route} onChange={(e) => handleTreatmentChange("chemoTreatments", i, "route", e.target.value)}>
-                <option value="">Select</option>
-                <option value="IV">IV</option>
-                <option value="Oral">Oral</option>
-              </select>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>DELIVERY</label>
-              <select value={t.delivery} onChange={(e) => handleTreatmentChange("chemoTreatments", i, "delivery", e.target.value)}>
-                <option value="">Select</option>
-                <option value="Buy & Bill">Buy & Bill</option>
-                <option value="Specialty Pharmacy">Specialty Pharmacy</option>
-              </select>
-            </div>
-          </div>
-        ))}
-        <button type="button" onClick={() => addTreatment("chemoTreatments")}>+ Add Chemo</button>
+       <h3>💊 Chemotherapy</h3>
+{formData.chemoTreatments.map((t, i) => (
+  <div key={i} style={{ border: "1px solid #ccc", margin: "10px", padding: "10px" }}>
+    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      {["jcode", "drug_name", "dose", "dosing_schedule", "indication"].map(field => (
+        <div key={field} style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+          <label>{field.replaceAll("_", " ").toUpperCase()}</label>
+          <input value={t[field]} onChange={(e) => handleTreatmentChange("chemoTreatments", i, field, e.target.value)} />
+        </div>
+      ))}
+      <div style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+        <label>ROUTE</label>
+        <select value={t.route} onChange={(e) => handleTreatmentChange("chemoTreatments", i, "route", e.target.value)}>
+          <option value="">Select</option>
+          <option value="IV">IV</option>
+          <option value="Oral">Oral</option>
+        </select>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+        <label>DELIVERY</label>
+        <select value={t.delivery} onChange={(e) => handleTreatmentChange("chemoTreatments", i, "delivery", e.target.value)}>
+          <option value="">Select</option>
+          <option value="Buy & Bill">Buy & Bill</option>
+          <option value="Specialty Pharmacy">Specialty Pharmacy</option>
+        </select>
+      </div>
+    </div>
+  </div>
+))}
+<button type="button" onClick={() => addTreatment("chemoTreatments")}>+ Add Chemo</button>
 
-        <h3>💉 Supportive Medications</h3>
-        {formData.supportiveTreatments.map((t, i) => (
-          <div key={i} style={{ border: "1px solid #ccc", margin: "10px", padding: "10px" }}>
-            {["jcode", "drug_name", "dose", "dosing_schedule", "indication"].map(field => (
-              <div key={field} style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-                <label>{field.replaceAll("_", " ").toUpperCase()}</label>
-                <input value={t[field]} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, field, e.target.value)} />
-              </div>
-            ))}
-            <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>ROUTE</label>
-              <select value={t.route} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, "route", e.target.value)}>
-                <option value="">Select</option>
-                <option value="IV">IV</option>
-                <option value="Oral">Oral</option>
-              </select>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-              <label>DELIVERY</label>
-              <select value={t.delivery} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, "delivery", e.target.value)}>
-                <option value="">Select</option>
-                <option value="Buy & Bill">Buy & Bill</option>
-                <option value="Specialty Pharmacy">Specialty Pharmacy</option>
-              </select>
-            </div>
-          </div>
-        ))}
-        <button type="button" onClick={() => addTreatment("supportiveTreatments")}>+ Add Supportive Med</button>
+<h3>💉 Supportive Medications</h3>
+{formData.supportiveTreatments.map((t, i) => (
+  <div key={i} style={{ border: "1px solid #ccc", margin: "10px", padding: "10px" }}>
+    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      {["jcode", "drug_name", "dose", "dosing_schedule", "indication"].map(field => (
+        <div key={field} style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+          <label>{field.replaceAll("_", " ").toUpperCase()}</label>
+          <input value={t[field]} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, field, e.target.value)} />
+        </div>
+      ))}
+      <div style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+        <label>ROUTE</label>
+        <select value={t.route} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, "route", e.target.value)}>
+          <option value="">Select</option>
+          <option value="IV">IV</option>
+          <option value="Oral">Oral</option>
+        </select>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+        <label>DELIVERY</label>
+        <select value={t.delivery} onChange={(e) => handleTreatmentChange("supportiveTreatments", i, "delivery", e.target.value)}>
+          <option value="">Select</option>
+          <option value="Buy & Bill">Buy & Bill</option>
+          <option value="Specialty Pharmacy">Specialty Pharmacy</option>
+        </select>
+      </div>
+    </div>
+  </div>
+))}
+<button type="button" onClick={() => addTreatment("supportiveTreatments")}>+ Add Supportive Med</button>
+              
 
         <h3>👨‍⚕️ Provider Info</h3>
-        {["ordering_provider", "ordering_npi", "ordering_tin", "treating_provider", "treating_npi", "treating_tin", "site_name", "site_npi", "site_tin"].map(field => (
-          <div key={field} style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
-            <label>{field.replaceAll("_", " ").toUpperCase()}</label>
-            <input name={field} value={formData[field]} onChange={handleChange} />
-          </div>
-        ))}
+
+<div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+  {["ordering_provider", "ordering_npi", "ordering_tin"].map(field => (
+    <div key={field} style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+      <label>{field.replaceAll("_", " ").toUpperCase()}</label>
+      <input name={field} value={formData[field]} onChange={handleChange} />
+    </div>
+  ))}
+</div>
+
+<div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}>
+  {["treating_provider", "treating_npi", "treating_tin"].map(field => (
+    <div key={field} style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+      <label>{field === "treating_provider" ? "TREATING PROVIDER (IF DIFFERENT)" : field.replaceAll("_", " ").toUpperCase()}</label>
+      <input name={field} value={formData[field]} onChange={handleChange} />
+    </div>
+  ))}
+</div>
+
+<div style={{ display: "flex", gap: "10px", flexWrap: "wrap", marginTop: "10px" }}>
+  {["site_name", "site_npi", "site_tin"].map(field => (
+    <div key={field} style={{ display: "flex", flexDirection: "column", flex: "1 1 150px" }}>
+      <label>{field === "site_name" ? "PLACE OF TREATMENT (IF DIFFERENT)" : field.replaceAll("_", " ").toUpperCase()}</label>
+      <input name={field} value={formData[field]} onChange={handleChange} />
+    </div>
+  ))}
+</div>
+
 
         <h3>📎 Attachments + Notes</h3>
         <div style={{ display: "flex", flexDirection: "column", marginBottom: "10px" }}>
