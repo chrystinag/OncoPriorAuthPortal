@@ -19,7 +19,7 @@ export default function SubmitPA() {
     request_type: "Standard",
     contact_name: "", contact_phone: "", contact_fax: "",
     first_name: "", last_name: "", dob: "", sex: "",
-    height: "", weight: "", bsa: "", member_id: "", insurance: "",
+    height: "", weight: "", bsa: "", member_id: "", insurance: "", line_of_business: "", 
     primary_icd: "", primary_diagnosis: "",
     secondary_dx: [{ icd: "", diagnosis: "" }],
     cancer_stage: "",
@@ -29,6 +29,7 @@ export default function SubmitPA() {
     ordering_provider: "", ordering_npi: "", ordering_tin: "",
     treating_provider: "", treating_npi: "", treating_tin: "",
     site_name: "", site_npi: "", site_tin: "", notes: ""
+    checklist_items: [],
   });
 
   const [file, setFile] = useState(null);
@@ -80,6 +81,40 @@ export default function SubmitPA() {
     const blank = { jcode: "", drug_name: "", route: "", dose: "", dosing_schedule: "", indication: "", delivery: "" };
     setFormData({ ...formData, [section]: [...formData[section], blank] });
   };
+  const fetchGuidelineChecklist = async () => {
+  if (
+    !formData.insurance ||
+    !formData.line_of_business ||
+    !formData.primary_icd ||
+    formData.chemoTreatments.length === 0 ||
+    !formData.chemoTreatments[0].jcode
+  ) {
+    setMessage("Please enter Insurance, LOB, ICD code, and first CPT (jcode) to check guidelines.");
+    return;
+  }
+
+  const { data, error } = await supabase
+    .from("clinical_guidelines")
+    .select("documentation_required")
+    .eq("payer_name", formData.insurance.trim())
+    .eq("line_of_business", formData.line_of_business.trim())
+    .eq("diagnosis_code", formData.primary_icd.trim().toUpperCase())
+    .eq("cpt_code", formData.chemoTreatments[0].jcode.trim());
+
+  if (error) {
+    console.error(error);
+    setMessage("Error fetching clinical guidelines.");
+  } else if (data.length === 0) {
+    setMessage("No matching guideline found.");
+  } else {
+    setFormData(prev => ({
+      ...prev,
+      checklist_items: data[0].documentation_required.map(doc => ({ name: doc, checked: false }))
+    }));
+    setMessage("Checklist loaded.");
+  }
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setUploading(true);
@@ -277,6 +312,8 @@ export default function SubmitPA() {
           </div>
         ))}
         <button type="button" onClick={() => addTreatment("supportiveTreatments")}>+ Add Supportive Med</button>
+
+<button type="button" onClick={fetchGuidelineChecklist}>Load Clinical Guidelines</button>
 
         {/* 👨‍⚕️ Provider Info */}
         <h3>👨‍⚕️ Provider Info</h3>
