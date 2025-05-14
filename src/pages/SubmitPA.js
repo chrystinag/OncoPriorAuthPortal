@@ -245,6 +245,11 @@ export default function SubmitPA() {
           ))}
         </div>
 
+<div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+    <label>LINE OF BUSINESS</label>
+    <input name="line_of_business" value={formData.line_of_business} onChange={handleChange} />
+</div>
+
         {/* Diagnosis Information */}
         <h3>🧬 Diagnosis Information</h3>
         <div style={{ display: "flex", gap: "10px" }}>
