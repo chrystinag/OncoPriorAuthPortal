@@ -45,19 +45,23 @@ export default function SubmitPA() {
   }, [formData.height, formData.weight]);
 
   useEffect(() => {
-    if (formData.primary_icd && icdLookup[formData.primary_icd]) {
-      setFormData(prev => ({ ...prev, primary_diagnosis: icdLookup[formData.primary_icd] }));
-    }
-  }, [formData.primary_icd]);
+  const code = formData.primary_icd.trim().toUpperCase();
+  if (code && icdLookup[code]) {
+    setFormData(prev => ({ ...prev, primary_diagnosis: icdLookup[code] }));
+  }
+}, [formData.primary_icd]);
 
   const handleSecondaryDxChange = (index, field, value) => {
-    const updated = [...formData.secondary_dx];
-    updated[index][field] = value;
-    if (field === "icd" && icdLookup[value]) {
-      updated[index]["diagnosis"] = icdLookup[value];
+  const updated = [...formData.secondary_dx];
+  updated[index][field] = value;
+  if (field === "icd") {
+    const code = value.trim().toUpperCase();
+    if (icdLookup[code]) {
+      updated[index]["diagnosis"] = icdLookup[code];
     }
-    setFormData({ ...formData, secondary_dx: updated });
-  };
+  }
+  setFormData({ ...formData, secondary_dx: updated });
+};
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
