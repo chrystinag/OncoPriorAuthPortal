@@ -29,7 +29,7 @@ export default function SubmitPA() {
     ordering_provider: "", ordering_npi: "", ordering_tin: "",
     treating_provider: "", treating_npi: "", treating_tin: "",
     site_name: "", site_npi: "", site_tin: "", notes: ""
-    checklist_items: [],
+    checklist_items: []
   });
 
   const [file, setFile] = useState(null);
