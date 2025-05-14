@@ -16,21 +16,60 @@ const icdLookup = {
 
 export default function SubmitPA() {
   const [formData, setFormData] = useState({
-    request_type: "Standard",
-    contact_name: "", contact_phone: "", contact_fax: "",
-    first_name: "", last_name: "", dob: "", sex: "",
-    height: "", weight: "", bsa: "", member_id: "", insurance: "", line_of_business: "", 
-    primary_icd: "", primary_diagnosis: "",
-    secondary_dx: [{ icd: "", diagnosis: "" }],
-    cancer_stage: "",
-    treatment_start_date: "",
-    chemoTreatments: [{ jcode: "", drug_name: "", route: "", dose: "", dosing_schedule: "", indication: "", delivery: "" }],
-    supportiveTreatments: [{ jcode: "", drug_name: "", route: "", dose: "", dosing_schedule: "", indication: "", delivery: "" }],
-    ordering_provider: "", ordering_npi: "", ordering_tin: "",
-    treating_provider: "", treating_npi: "", treating_tin: "",
-    site_name: "", site_npi: "", site_tin: "", notes: ""
-    checklist_items: []
-  });
+  request_type: "Standard",
+  contact_name: "",
+  contact_phone: "",
+  contact_fax: "",
+  first_name: "",
+  last_name: "",
+  dob: "",
+  sex: "",
+  height: "",
+  weight: "",
+  bsa: "",
+  member_id: "",
+  insurance: "",
+  line_of_business: "",
+  primary_icd: "",
+  primary_diagnosis: "",
+  secondary_dx: [{ icd: "", diagnosis: "" }],
+  cancer_stage: "",
+  treatment_start_date: "",
+  chemoTreatments: [
+    {
+      jcode: "",
+      drug_name: "",
+      route: "",
+      dose: "",
+      dosing_schedule: "",
+      indication: "",
+      delivery: ""
+    }
+  ],
+  supportiveTreatments: [
+    {
+      jcode: "",
+      drug_name: "",
+      route: "",
+      dose: "",
+      dosing_schedule: "",
+      indication: "",
+      delivery: ""
+    }
+  ],
+  ordering_provider: "",
+  ordering_npi: "",
+  ordering_tin: "",
+  treating_provider: "",
+  treating_npi: "",
+  treating_tin: "",
+  site_name: "",
+  site_npi: "",
+  site_tin: "",
+  notes: "",
+  checklist_items: []
+});
+
 
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
